@@ -1,11 +1,11 @@
-# iAjax
-### Introduction
+iAjax
+# Introduction
 
 `iAjax` library to handle Ajax operations. Without dependencies.
 
-### Roadmap
+# Roadmap
 
 Here you will see goals of project - [ROADMAP](https://github.com/mzahradnicek/iAjax/blob/master/ROADMAP.md)
 
-### License
+# License
 [MIT](http://opensource.org/licenses/MIT)
