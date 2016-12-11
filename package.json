@@ -1,0 +1,40 @@
+{
+  "name": "iajax",
+  "version": "0.0.1",
+  "description": "Ajax wrapper library",
+  "main": "null",
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
+  "dependencies": {
+    "babel-core": "^6.18.2",
+    "babel-loader": "^6.2.8",
+    "babel-polyfill": "^6.16.0",
+    "babel-preset-latest": "^6.16.0",
+    "webpack": "^1.13.3"
+  },
+  "devDependencies": {
+    "httpdispatcher": "^2.0.1",
+    "webpack": "^1.13.3"
+  },
+  "scripts": {
+    "test": "node test/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mzahradnicek/iAjax.git"
+  },
+  "keywords": [
+    "ajax",
+    "forms",
+    "xhr",
+    "xmlhttpresponse"
+  ],
+  "author": "Michal Zahradníček",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mzahradnicek/iAjax/issues"
+  },
+  "homepage": "https://github.com/mzahradnicek/iAjax#readme"
+}
