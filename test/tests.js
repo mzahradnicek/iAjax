@@ -158,6 +158,68 @@ function jsonpTest() {
 	});
 }
 
+//json parser
+function testJsonParser() {
+	return new Promise((resolve, reject) => {
+		iAjax.request({
+			url: '/json',
+			success: function(data) {
+				addLogMsg('JSON parser test - passed');
+				console.log('Parsed JSON object',data);
+				resolve();
+			},
+			error: function(type, e, xhr) {
+				addLogMsg('JSON parser - failed');
+				console.log(arguments);
+				reject();
+			}
+		}).send();
+	});
+}
+
+//xml parser
+function testXMLParser() {
+	return new Promise((resolve, reject) => {
+		iAjax.request({
+			url: '/xml',
+			success: function(data) {
+				addLogMsg('XML parser test - passed');
+				console.log('Parsed XML object',data);
+				resolve();
+			},
+			error: function(type, e, xhr) {
+				addLogMsg('XML parser - failed');
+				console.log(arguments);
+				reject();
+			}
+		}).send();
+	});
+}
+
+//add custom parser
+//very simple csv parser - dont use in production!!!
+iAjax.responseParser('addParser', 'text/csv', function(inp) {
+	return inp.split(';');
+});
+
+function testCustomParser() {
+	return new Promise((resolve, reject) => {
+		iAjax.request({
+			url: '/csv',
+			success: function(data) {
+				addLogMsg('Custom parser test - passed');
+				console.log('Parsed CSV object',data);
+				resolve();
+			},
+			error: function(type, e, xhr) {
+				addLogMsg('Custom parser - failed');
+				console.log(arguments);
+				reject();
+			}
+		}).send();
+	});
+}
+
 testSimple()
 	.then(test500)
 	.then(test404)
@@ -166,4 +228,7 @@ testSimple()
 	.then(beforeProcessRequestTest)
 	.then(getHelperTest)
 	.then(jsonpTest)
+	.then(testJsonParser)
+	.then(testXMLParser)
+	.then(testCustomParser)
 	;

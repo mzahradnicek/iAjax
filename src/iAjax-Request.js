@@ -1,9 +1,12 @@
 
+import responseParser from './iAjax-ResponseParser';
+
 const Request = function(opt) {
 	this.opt = Object.assign({
 		method	: 'GET',
 		async	: true,
 		data	: null,
+		jsonp	: false,
 		success	: function(data, e, xhr) {
 		},
 		error	: function(type, ev, xhr) {
@@ -17,8 +20,7 @@ Request.prototype = {
 		if (!this.opt.url) throw 'URL parameter for Request is not set.';
 
 		//check domain - if use JSONP
-		var a = document.createElement('a'), finalUrl = this.opt.url;
-		a.href = this.opt.url;
+		var finalUrl = this.opt.url;
 
 		//add data to url for GET and DELETE method
 		if (this.opt.data !== null && [ 'get', 'delete' ].indexOf(this.opt.method.toLowerCase()) != -1) {
@@ -27,7 +29,7 @@ Request.prototype = {
 			finalUrl = finalUrl + (finalUrl.indexOf('?') > -1 ? '&':'?') + urlParams.join('&');
 		}
 
-		if (window.location.hostname == a.hostname) {	//use XMLHttpRequest
+		if (!this.opt.jsonp) {	//use XMLHttpRequest
 			this.sendXMLHttpRequest(finalUrl);
 		} else if(this.opt.method.toLowerCase() == 'get') {	//use JSONP
 			this.sendJSONPRequest(finalUrl);
@@ -94,7 +96,7 @@ Request.prototype = {
 
 		if (!this.beforeProcessRequest(this.xhr)) return;
 
-		if (this.xhr.status < 400) this.opt.success(this.xhr.responseText, e, this.xhr);
+		if (this.xhr.status < 400) this.opt.success(responseParser(this.xhr), e, this.xhr);
 			else this.opt.error('http', e, this.xhr);
 	},
 	xhrLoadEndEvent: function(e) {

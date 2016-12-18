@@ -2,13 +2,12 @@
 
 import request from './iAjax-Request';
 import httpHelpersBase from './iAjax-HttpHelpersBase';
-import jsonp from './iAjax-Jsonp';
+import responseParser from './iAjax-ResponseParser';
 
 require('./iAjax-Core');
 
 var iAjax = {
 	request,
-	jsonp,
 	get: function() {
 		var args = Array.prototype.slice.call(arguments);
 		args.unshift('get');
@@ -28,7 +27,8 @@ var iAjax = {
 		var args = Array.prototype.slice.call(arguments);
 		args.unshift('delete');
 		return httpHelpersBase.apply(null, args);
-	}
+	},
+	responseParser
 };
 
 module.exports = iAjax;

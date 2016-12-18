@@ -29,6 +29,37 @@ dispatcher.onGet('/error-301', function(req, res) {
 	res.end('moved permanently 301');
 });
 
+dispatcher.onGet('/json', function(req, res) {
+	var str = {
+		'species': 'cat',
+		'name' : 'Garfield',
+		'weight' : 30
+	};
+	res.writeHead(200, { 'Content-Type': 'application/json' });
+	res.end(JSON.stringify(str));
+});
+
+//xml
+dispatcher.onGet('/xml', function(req, res) {
+	var filePath = path.join(__dirname, 'content.xml');
+	var stat = fs.statSync(filePath);
+
+	res.writeHead(200, {
+		'Content-Type': 'application/xml',
+		'Content-Length': stat.size
+	});
+
+	var readStream = fs.createReadStream(filePath);
+	readStream.pipe(res);
+});
+
+//custom csv
+dispatcher.onGet('/csv', function(req, res) {
+	res.writeHead(200, { 'Content-Type': 'text/csv' });
+	res.end('10;30;some text;23456;LOL');
+});
+
+
 //index.html
 dispatcher.onGet('/', function(req, res) {
 	var filePath = path.join(__dirname, 'index.html');
