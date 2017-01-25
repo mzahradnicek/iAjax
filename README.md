@@ -1,7 +1,7 @@
 #improved Ajax library
 ## Introduction
 
-`iAjax` is standalone library over Ajax operations in browser. It has helpers for GET, POST, PUT, DELETE operations.
+`iAjax` is standalone library over Ajax operations in browser. It has helpers for GET, POST, PUT, DELETE operations. It supports sending FORMs via Ajax.
 
 It has built-in **parser**, which automatically parse response data due to the `Content-Type` header from server. In base are parsers for JSON and XML. You can also add your own parser functions based on mime type of response(eg. csv).
 
@@ -49,7 +49,6 @@ iAjax.request('prototype', 'beforeProcessRequest', function(xhr) {
 	return false;
 });
 ```
-
 ### HTML Form handling with Ajax
 ```javascript
 iAjax.form('#formSelector', {
