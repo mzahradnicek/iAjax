@@ -23,7 +23,7 @@ Form object is virtual form - base for sending forms using FormData
 
 #0.5 Handle files
 
-#0.6 Progress loading
+#0.6 Batch loading
 
 ...etc
 #1.0 We're done

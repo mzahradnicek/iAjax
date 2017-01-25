@@ -15,6 +15,7 @@
     "webpack": "^1.13.3"
   },
   "devDependencies": {
+    "busboy": "^0.2.14",
     "httpdispatcher": "^2.0.1",
     "webpack": "^1.13.3"
   },

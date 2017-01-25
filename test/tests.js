@@ -220,6 +220,153 @@ function testCustomParser() {
 	});
 }
 
+//virtual form test
+function testGetVirtualForm() {
+	return new Promise((resolve, reject) => {
+		var iFrm = iAjax.form({ 'foo': 'bar' }, {
+			url: '/form-get',
+			method: 'get',
+			success: function(data, form, e, xhr) {
+				addLogMsg('Basic Get Virtual Form - '+data['message']);
+				resolve();
+			},
+			error: function(type, form, e, xhr) {
+				addLogMsg('Basic Get Virtual Form - failed');
+				console.log(arguments);
+				reject();
+			}
+		});
+
+		iFrm.submit();
+	});
+}
+
+function testGetVirtualMultiForm() {
+	return new Promise((resolve, reject) => {
+		var iFrm = iAjax.form({ 'foo[]': [ 'bar','baz' ], 'multi': true }, {
+			url: '/form-get',
+			method: 'get',
+			success: function(data, form, e, xhr) {
+				addLogMsg('Basic Get Array Param Virtual Form - '+data['message']);
+				resolve();
+			},
+			error: function(type, form, e, xhr) {
+				addLogMsg('Basic Get Array Param Virtual Form - failed');
+				console.log(arguments);
+				reject();
+			}
+		});
+
+		iFrm.submit();
+	});
+}
+
+function testPostVirtualForm() {
+	return new Promise((resolve, reject) => {
+		var iFrm = iAjax.form({ 'foo': 'bar' }, {
+			url: '/form-post',
+			success: function(data, form, e, xhr) {
+				addLogMsg('Basic Post Virtual Form - '+data['message']);
+				resolve();
+			},
+			error: function(type, form, e, xhr) {
+				addLogMsg('Basic Post Virtual Form - failed');
+				console.log(arguments);
+				reject();
+			}
+		});
+
+		iFrm.submit();
+	});
+}
+
+function testPostVirtualMultiForm() {
+	return new Promise((resolve, reject) => {
+		var iFrm = iAjax.form({ 'foo[]': [ 'bar','baz' ], 'multi': true }, {
+			url: '/form-post',
+			success: function(data, form, e, xhr) {
+				addLogMsg('Basic Post Array Param Virtual Form - '+data['message']);
+				resolve();
+			},
+			error: function(type, form, e, xhr) {
+				addLogMsg('Basic Post Array Param Virtual Form - failed');
+				console.log(arguments);
+				reject();
+			}
+		});
+
+		iFrm.submit();
+	});
+}
+
+function testGetRealForm() {
+	var frm = document.querySelector('#getForm');
+	frm.style.display = 'block';
+
+	return new Promise((resolve, reject) => {
+		var iFrm = iAjax.form('#getFrm', {
+			beforeSend: function() {
+				this.append('appendedField','yes');
+				return true;
+			},
+			success: function(data, form, e, xhr) {
+				addLogMsg('Real Get Form - '+data['message']);
+				frm.style.display = 'none';
+				resolve();
+			},
+			error: function(type, form, e, xhr) {
+				addLogMsg('Real Get Form - failed');
+				console.log(arguments);
+				reject();
+			}
+		});
+	});
+}
+
+function testPostRealForm() {
+	var frm = document.querySelector('#postForm');
+	frm.style.display = 'block';
+
+	return new Promise((resolve, reject) => {
+		var iFrm = iAjax.form('#postFrm', {
+			beforeSend: function() {
+				this.append('appendedField','yes');
+				return true;
+			},
+			success: function(data, form, e, xhr) {
+				frm.style.display = 'none';
+				if (!data['success']) {
+					addLogMsg('Real Post From - Failed on server');
+					reject();
+					return;
+				}
+
+				var fData = data['data'];
+				if (
+					fData['foo'] == 'bar' &&
+					fData['input-text'] == 'World' &&
+					fData['radvalue'] == 1 &&
+					fData['select'] == 3 &&
+					fData['appendedField'] == 'yes'
+				) {
+					addLogMsg('Real Post Form - Success');
+					resolve();
+					return;
+				}
+
+				addLogMsg('Real Post Form - Failed - Wrong values');
+				reject();
+			},
+			error: function(type, form, e, xhr) {
+				addLogMsg('Real Post Form - failed');
+				console.log(arguments);
+				reject();
+			}
+		});
+	});
+}
+
+
 testSimple()
 	.then(test500)
 	.then(test404)
@@ -231,4 +378,10 @@ testSimple()
 	.then(testJsonParser)
 	.then(testXMLParser)
 	.then(testCustomParser)
+	.then(testGetVirtualForm)
+	.then(testGetVirtualMultiForm)
+	.then(testPostVirtualForm)
+	.then(testPostVirtualMultiForm)
+	.then(testGetRealForm)
+	.then(testPostRealForm)
 	;

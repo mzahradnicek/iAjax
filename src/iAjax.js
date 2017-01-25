@@ -1,6 +1,7 @@
 //Main iAjax container
 
 import request from './iAjax-Request';
+import form from './iAjax-Form';
 import httpHelpersBase from './iAjax-HttpHelpersBase';
 import responseParser from './iAjax-ResponseParser';
 
@@ -28,7 +29,8 @@ var iAjax = {
 		args.unshift('delete');
 		return httpHelpersBase.apply(null, args);
 	},
-	responseParser
+	responseParser,
+	form
 };
 
 module.exports = iAjax;

@@ -5,6 +5,29 @@
 <body>
 Test is running!
 <div id="testLog"></div>
+<div id="getForm" style="display:none">
+<form action="/form-get" method="get" id="getFrm">
+<input type="hidden" name="foo" value="bar">
+<input type="text" name="input-text" value="Hello">
+<select name="select">
+<option value="1">1</option>
+<option value="2" selected>2</option>
+<option value="3">3</option>
+</select> <button type="submit">Send via GET</button>
+</form></div>
+<div id="postForm" style="display:none">
+<form action="/form-post" method="post" id="postFrm">
+<input type="hidden" name="foo" value="bar">
+<input type="text" name="input-text" value="World">
+<label><input type="radio" name="radvalue" value="1" checked> 1</label>
+<label><input type="radio" name="radvalue" value="2"> 2<label>
+<select name="select">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3" selected>3</option>
+</select> <button type="submit">Send via POST</button>
+</form></div>
+
 <script type="text/javascript" src="/tests.js"></script>
 </body>
 </html>

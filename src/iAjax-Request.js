@@ -6,6 +6,7 @@ const Request = function(opt) {
 		method	: 'GET',
 		async	: true,
 		data	: null,
+		headers	: null,
 		jsonp	: false,
 		success	: function(data, e, xhr) {
 		},
@@ -25,7 +26,15 @@ Request.prototype = {
 		//add data to url for GET and DELETE method
 		if (this.opt.data !== null && [ 'get', 'delete' ].indexOf(this.opt.method.toLowerCase()) != -1) {
 			var urlParams = [], uData = this.opt.data;
-			for(var i in uData) urlParams.push(encodeURIComponent(i)+'='+encodeURIComponent(uData[i]));
+			for(var i in uData) {
+				if (uData[i] instanceof Array) {
+					for (var j in uData[i]) 
+						urlParams.push(encodeURIComponent(i)+'='+encodeURIComponent(uData[i][j]));
+					continue;
+				}
+
+				urlParams.push(encodeURIComponent(i)+'='+encodeURIComponent(uData[i]));
+			}
 			finalUrl = finalUrl + (finalUrl.indexOf('?') > -1 ? '&':'?') + urlParams.join('&');
 		}
 
@@ -51,6 +60,12 @@ Request.prototype = {
 		}
 
 		this.xhr.open.apply(this.xhr, xArgs);
+
+		//set headers
+		if (this.opt.headers) {
+			var hs = this.opt.headers;
+			for(var i in hs) this.xhr.setRequestHeader(i, hs[i]);
+		}
 
 		this.xhr.addEventListener('loadstart', this.xhrLoadStartEvent.bind(this));
 		this.xhr.addEventListener('progress', this.xhrProgressEvent.bind(this));

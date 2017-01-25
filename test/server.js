@@ -1,5 +1,8 @@
 var http = require('http');
+var qs = require('querystring');
+var url = require('url');
 var fs = require('fs');
+var Busboy = require('busboy');
 var path = require('path');
 var HttpDispatcher = require('httpdispatcher');
 var dispatcher = new HttpDispatcher();
@@ -59,6 +62,71 @@ dispatcher.onGet('/csv', function(req, res) {
 	res.end('10;30;some text;23456;LOL');
 });
 
+//form get
+dispatcher.onGet('/form-get', function(req, res) {
+	res.writeHead(200, { 'Content-Type': 'application/json' });
+
+	var rUrl = url.parse(req.url, true);
+	var jres = {};
+	if (rUrl.query.multi) {
+		jres['message'] = rUrl.query['foo[]'][0] == 'bar' && rUrl.query['foo[]'][1] == 'baz' ? 'Success multi':'Error multi param values';
+	} else jres['message'] = rUrl.query.foo != 'bar' ? 'Error param value':'Success';
+
+	res.end(JSON.stringify(jres));
+});
+
+//form post
+dispatcher.onPost('/form-post', function(req, res) {
+	res.writeHead(200, { 'Content-Type': 'application/json' });
+
+	var   jres = {};
+
+	if (req.params.multi) {
+		jres['message'] = req.params['foo[]'] && req.params['foo[]'][0] == 'bar' && req.params['foo[]'][1] == 'baz' ? 'Recieve multi foo param':'Error recieving multi foo param';
+	} else
+		jres['message'] = req.params.foo && req.params.foo == 'bar' ? 'Recieved POST foo=bar':'Error recieving foo';
+
+	res.end(JSON.stringify(jres));
+
+
+/*
+	var body = '';
+
+	req.on('data', function(data) {
+		body += data;
+		console.log('dataaaa');
+	});
+
+	req.on('end', function() {
+		var POST = qs.parse(body);
+console.log('postdata', POST);
+		var jres = {};
+		if (POST.multi) {
+			jres['message'] = POST['foo[]'][0] == 'bar' && POST['foo[]'][1] == 'baz' ? 'Success multi':'Error multi param values';
+		} else jres['message'] = POST.foo != 'bar' ? 'Error param value':'Success';
+
+		res.end(JSON.stringify(jres));
+	});
+*/
+});
+
+var multipartFormAction = function(req, res) {
+	res.writeHead(200, { 'Content-Type': 'application/json' });
+
+	var busboy = new Busboy({ headers: req.headers }), jres = { data:{} };
+
+	busboy.on('field', function(name, val) {
+		jres['data'][name] = val;
+	});
+
+	busboy.on('finish', function() {
+		jres['success'] = true;
+		res.end(JSON.stringify(jres));
+	});
+
+	req.pipe(busboy);
+}
+
 
 //index.html
 dispatcher.onGet('/', function(req, res) {
@@ -103,7 +171,8 @@ dispatcher.onGet('/tests.js', function(req, res) {
 http.createServer(function(req, res) {
 	try {
 		console.log(req.url);
-		dispatcher.dispatch(req, res);
+		if (req.method == 'POST' && req.headers['content-type'].indexOf('multipart') > -1) multipartFormAction(req, res);
+			else dispatcher.dispatch(req, res);
 	} catch(e) {
 		console.log(e);
 	}

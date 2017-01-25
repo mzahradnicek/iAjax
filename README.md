@@ -50,6 +50,34 @@ iAjax.request('prototype', 'beforeProcessRequest', function(xhr) {
 });
 ```
 
+### HTML Form handling with Ajax
+```javascript
+iAjax.form('#formSelector', {
+	beforeSend: function() {
+		this.append('appendedField','yes');
+		return true;
+	},
+	success: function(data, form, e, xhr) {
+		//success handling
+	},
+	error: function(type, form, e, xhr) {
+		//error handling
+	}
+});
+```
+
+### Virtual form
+```javascript
+iAjax.form({ firstName: 'Michael', lastName: 'Smith' }, {
+	success: function(data, form, e, xhr) {
+		//success handling
+	},
+	error: function(type, form, e, xhr) {
+		//error handling
+	}
+});
+```
+
 ## Roadmap
 
 Here you will see goals of project - [ROADMAP](https://github.com/mzahradnicek/iAjax/blob/master/ROADMAP.md)
