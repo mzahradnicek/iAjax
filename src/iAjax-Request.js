@@ -114,12 +114,13 @@ Request.prototype = {
 		if (this.opt.abort) this.opt.abort(e, this.xhr);
 	},
 	xhrLoadEvent: function(e) {
-		if (this.opt.load) this.opt.load(e, this.xhr);
+		let response = responseParser(this.xhr)
+		if (this.opt.load) this.opt.load(e, this.xhr, response);
 
 		if (!this.beforeProcessRequest(this.xhr)) return;
 
-		if (this.xhr.status < 400) this.opt.success(responseParser(this.xhr), e, this.xhr);
-			else this.opt.error('http', e, this.xhr, responseParser(this.xhr));
+		if (this.xhr.status < 400) this.opt.success(response, e, this.xhr);
+			else this.opt.error('http', e, this.xhr, response);
 	},
 	xhrLoadEndEvent: function(e) {
 		if (this.opt.loadEnd) this.opt.loadEnd(e, this.xhr);

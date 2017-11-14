@@ -1,6 +1,6 @@
 {
   "name": "iajax",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Ajax wrapper library",
   "main": "src/iAjax.js",
   "files": [ "src/", "dist/" ],

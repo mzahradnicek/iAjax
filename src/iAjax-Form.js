@@ -164,8 +164,8 @@ Form.prototype = {
 	frmAbortEvent: function(e, xhr) {
 		if (this.opt.abort) this.opt.abort(this, e, xhr);
 	},
-	frmLoadEvent: function(e, xhr) {
-		if (this.opt.load) this.opt.load(this, e, xhr);
+	frmLoadEvent: function(e, xhr, res) {
+		if (this.opt.load) this.opt.load(this, e, xhr, res);
 	},
 	frmSuccessEvent: function(data, e, xhr) {
 		this.opt.success(data, this, e, xhr);
