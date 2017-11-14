@@ -3,7 +3,7 @@ import request from './iAjax-Request';
 
 //params: url, data, success, error, format
 export default function(method, url) {
-	if ([ 'get', 'post', 'put', 'delete' ].indexOf(method.toLowerCase())) {
+	if ([ 'get', 'post', 'put', 'delete' ].indexOf(method.toLowerCase()) == -1) {
 		throw 'Method '+method+' not supported';
 	}
 

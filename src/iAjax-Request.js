@@ -8,34 +8,40 @@ const Request = function(opt) {
 		data	: null,
 		headers	: null,
 		jsonp	: false,
+		baseUrl	: '',
+		withCredentials	: false,
 		success	: function(data, e, xhr) {
 		},
-		error	: function(type, ev, xhr) {
+		error	: function(type, ev, xhr, data) {
 			throw "Error "+type;
 		}
-	}, opt);
+	}, this.baseOpt, opt);
 };
 
 Request.prototype = {
+	baseOpt: { },
 	send: function() {
 		if (!this.opt.url) throw 'URL parameter for Request is not set.';
 
 		//check domain - if use JSONP
-		var finalUrl = this.opt.url;
+		var finalUrl = (this.opt.url.indexOf('//') != -1 ? '' : this.opt.baseUrl) + this.opt.url;
 
 		//add data to url for GET and DELETE method
-		if (this.opt.data !== null && [ 'get', 'delete' ].indexOf(this.opt.method.toLowerCase()) != -1) {
-			var urlParams = [], uData = this.opt.data;
+		if (this.opt.data !== null && Object.prototype.toString.apply(this.opt.data) == '[object Object]') {
+			var qsData = [], uData = this.opt.data;
 			for(var i in uData) {
 				if (uData[i] instanceof Array) {
 					for (var j in uData[i]) 
-						urlParams.push(encodeURIComponent(i)+'='+encodeURIComponent(uData[i][j]));
+						qsData.push(encodeURIComponent(i)+'='+encodeURIComponent(uData[i][j]));
 					continue;
 				}
 
-				urlParams.push(encodeURIComponent(i)+'='+encodeURIComponent(uData[i]));
+				qsData.push(encodeURIComponent(i)+'='+encodeURIComponent(uData[i]));
 			}
-			finalUrl = finalUrl + (finalUrl.indexOf('?') > -1 ? '&':'?') + urlParams.join('&');
+
+			if ([ 'get', 'delete' ].indexOf(this.opt.method.toLowerCase()) != -1)
+				finalUrl = finalUrl + (finalUrl.indexOf('?') > -1 ? '&':'?') + qsData.join('&');
+			else this.opt.data = qsData.join('&');
 		}
 
 		if (!this.opt.jsonp) {	//use XMLHttpRequest
@@ -60,6 +66,7 @@ Request.prototype = {
 		}
 
 		this.xhr.open.apply(this.xhr, xArgs);
+		if (this.opt.withCredentials) this.xhr.withCredentials = true;
 
 		//set headers
 		if (this.opt.headers) {
@@ -76,7 +83,7 @@ Request.prototype = {
 		this.xhr.addEventListener('loadend', this.xhrLoadEndEvent.bind(this));
 
 		//send
-		this.xhr.send(this.opt.data != null && this.opt.method.toLowerCase() == 'post' ? this.opt.data:null);
+		this.xhr.send(this.opt.data != null && [ 'post','put' ].indexOf(this.opt.method.toLowerCase()) !== -1 ? this.opt.data:null);
 	},
 
 	setConfig: function(c) {
@@ -112,7 +119,7 @@ Request.prototype = {
 		if (!this.beforeProcessRequest(this.xhr)) return;
 
 		if (this.xhr.status < 400) this.opt.success(responseParser(this.xhr), e, this.xhr);
-			else this.opt.error('http', e, this.xhr);
+			else this.opt.error('http', e, this.xhr, responseParser(this.xhr));
 	},
 	xhrLoadEndEvent: function(e) {
 		if (this.opt.loadEnd) this.opt.loadEnd(e, this.xhr);
@@ -155,7 +162,7 @@ Request.prototype = {
 
 		//add error
 		script.addEventListener('error', function(e) {
-			this.opt.error('http', e);
+			this.opt.error('error', e);
 			clearRequest.apply(this);
 		}.bind(this));
 

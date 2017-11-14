@@ -146,6 +146,66 @@ function getHelperTest() {
 	});
 }
 
+function postHelperTest() {
+	return new Promise((resolve, reject) => {
+		var pData = { name: 'Jack Daniels', food: 'klobasa' }, testStatus = false;
+		iAjax.post('/form-post', pData, function(data) {
+
+			if (data['success'] == true) {
+				for(var k in pData) {
+					if (data['data'][k] && pData[k] == data['data'][k]) continue;
+						
+					testStatus = false;
+					break;
+				}
+			}
+			addLogMsg('Post method helper - <span style="color:green;">passed</span>');
+			resolve();
+		},
+		function(error) {
+			addLogMsg('Post method helper - <span style="color:red">error</span>');
+			reject();
+		});
+	});
+}
+
+function putHelperTest() {
+	return new Promise((resolve, reject) => {
+		var pData = { name: 'Jack Daniels', putmethod: true, food: 'klobasa' }, testStatus = false;
+		iAjax.put('/check-put', pData, function(data) {
+
+			if (data['success'] == true) {
+				for(var k in pData) {
+					if (data['data'][k] && pData[k] == data['data'][k]) continue;
+						
+					testStatus = false;
+					break;
+				}
+			}
+
+			addLogMsg('Put method helper - <span style="color:green;">passed</span>');
+			resolve();
+		},
+		function(error) {
+			addLogMsg('Put method helper - <span style="color:red">error</span>');
+			reject();
+		});
+	})
+}
+
+function deleteHelperTest() {
+	return new Promise((resolve, reject) => {
+		iAjax.delete('/delete-check', function(data) {
+			addLogMsg('Delete method helper - passed - '+data);
+			resolve();
+		},
+		function(error) {
+			addLogMsg('Delete method helper - error');
+			reject();
+		});
+	});
+}
+
 function jsonpTest() {
 	return new Promise((resolve, reject) => {
 		iAjax.get('http://ip.jsontest.com', function(res) {
@@ -266,8 +326,15 @@ function testPostVirtualForm() {
 		var iFrm = iAjax.form({ 'foo': 'bar' }, {
 			url: '/form-post',
 			success: function(data, form, e, xhr) {
-				addLogMsg('Basic Post Virtual Form - '+data['message']);
-				resolve();
+				console.log(data);
+				if (data['success'] == true && data['data']['foo'] == 'bar') {
+					addLogMsg('Basic Post Virtual Form - <i style="color:green">passed</i>');
+					resolve();
+					return;
+				}
+
+				addLogMsg('Basic Post Virtual Form - <i style="color:red">check failed</i>');
+				reject();
 			},
 			error: function(type, form, e, xhr) {
 				addLogMsg('Basic Post Virtual Form - failed');
@@ -366,6 +433,101 @@ function testPostRealForm() {
 	});
 }
 
+function testRealFileSend() {
+	var frmDiv = document.querySelector('#realFile');
+	frmDiv.style.display = 'block';
+
+	return new Promise((resolve, reject) => {
+		iAjax.form('#realFileForm', {
+			success: function(data, form, e, xhr) {
+				frmDiv.style.display = 'none';
+				if (!data['success']) {
+					addLogMsg('Real File Form - <i style="color:red">Failed on server</i>');
+					reject(); return;
+				}
+
+				if (!data['data']['filesend'] || data['data']['filesend'] != 'true') {
+					addLogMsg('Real File Form - <i style="color:red">Failed field send</i>');
+					reject(); return;
+				}
+
+				//check file
+				var files = form.opt.formEl.file.files;
+				for (var i = 0; i < files.length;i++) {
+					var frmFile = files[i], dFile = data['files'][frmFile.name] || false;
+
+					if (!dFile || dFile.length != frmFile.size) {
+						addLogMsg('Real File Form - <i style="color:red">Sending and recieving file "'+frmFile.name+'" doesnt match!</i>');
+						console.log(dFile, frmFile);
+						reject(); return;
+					}
+				}
+
+				addLogMsg('Real File Form - <i style="color:green">passed</i>');
+				resolve(); return;
+			},
+			error: function(type, form, e, xhr) {
+				frmDiv.style.display = 'none';
+				addLogMsg('Real File Form - <i style="color:red">failed</i>');
+				console.log(arguments);
+				reject();
+			}
+		});
+	});
+}
+
+function testBatchFileSend() {
+	var frmDiv = document.querySelector('#batchFile');
+	frmDiv.style.display = 'block';
+
+	return new Promise((resolve, reject) => {
+		iAjax.form('#batchFileForm', {
+			batch: true,
+			success: function(data, form, e, xhr) {
+				frmDiv.style.display = 'none';
+				if (!data['success']) {
+					addLogMsg('Batch File Form - <i style="color:red">Failed on server</i>');
+					return;
+				}
+
+				if (!data['data']['filesend'] || data['data']['filesend'] != 'true') {
+					addLogMsg('Batch File Form - <i style="color:red">Failed field send</i>');
+					return;
+				}
+
+				//check file
+				var files = form.opt.formEl.file.files,
+					dFiles = data['files'];
+
+				for (var i in dFiles) {
+					for (var j = 0; j < files.length;j++) {
+						if (files[j].name != i) continue;
+
+						if (dFiles[i].length != files[j].size) {
+							addLogMsg('Batch File Form - <i style="color:red">Sending and recieving file "'+files[j].name+'" doesnt match!</i>');
+						} else {
+							addLogMsg('Batch File Form - <i style="color:green">Sending and recieving file "'+files[j].name+'" passed!</i>');
+						}
+					}
+				}
+			},
+			progress: function() {
+				console.log('progress', arguments);
+			},
+			error: function(type, form, e, xhr) {
+				frmDiv.style.display = 'none';
+				addLogMsg('Batch File Form - <i style="color:red">failed</i>');
+				console.log(arguments);
+				reject();
+			},
+			batchStart: function() {
+				console.log('batchStartEvent', arguments);
+				return true;
+			}
+		});
+	});
+}
+
 
 testSimple()
 	.then(test500)
@@ -374,6 +536,9 @@ testSimple()
 	.then(eventsTest)
 	.then(beforeProcessRequestTest)
 	.then(getHelperTest)
+	.then(postHelperTest)
+	.then(putHelperTest)
+	.then(deleteHelperTest)
 	.then(jsonpTest)
 	.then(testJsonParser)
 	.then(testXMLParser)
@@ -384,4 +549,6 @@ testSimple()
 	.then(testPostVirtualMultiForm)
 	.then(testGetRealForm)
 	.then(testPostRealForm)
+	.then(testRealFileSend)
+	.then(testBatchFileSend)
 	;

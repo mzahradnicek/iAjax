@@ -28,6 +28,24 @@ Test is running!
 </select> <button type="submit">Send via POST</button>
 </form></div>
 
+<div id="realFile" style="display:none">
+<i>You can select multiple files</i>
+<form action="/post-multipart" method="post" type="multipart/form-data" id="realFileForm">
+<input type="hidden" name="filesend" value="true">
+<input type="file" name="file" multiple>
+<input type="submit" value="Send File">
+</form>
+</div>
+
+<div id="batchFile" style="display:none">
+<i>You have to select multiple files</i>
+<form action="/post-multipart" method="post" type="multipart/form-data" id="batchFileForm">
+<input type="hidden" name="filesend" value="true">
+<input type="file" name="file" multiple>
+<input type="submit" value="Send Files">
+</form>
+</div>
+
 <script type="text/javascript" src="/tests.js"></script>
 </body>
 </html>

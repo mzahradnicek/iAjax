@@ -1,23 +1,23 @@
 {
   "name": "iajax",
-  "version": "0.0.1",
+  "version": "1.0.10",
   "description": "Ajax wrapper library",
-  "main": "null",
+  "main": "src/iAjax.js",
+  "files": [ "src/", "dist/" ],
   "directories": {
     "doc": "docs",
     "example": "examples"
   },
   "dependencies": {
-    "babel-core": "^6.18.2",
-    "babel-loader": "^6.2.8",
-    "babel-polyfill": "^6.16.0",
-    "babel-preset-latest": "^6.16.0",
-    "webpack": "^1.13.3"
   },
   "devDependencies": {
     "busboy": "^0.2.14",
     "httpdispatcher": "^2.0.1",
-    "webpack": "^1.13.3"
+    "webpack": "^1.13.3",
+    "babel-core": "^6.18.2",
+    "babel-loader": "^6.2.8",
+    "babel-polyfill": "^6.16.0",
+    "babel-preset-latest": "^6.16.0"
   },
   "scripts": {
     "test": "node test/server.js"

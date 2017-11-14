@@ -7,30 +7,20 @@ import responseParser from './iAjax-ResponseParser';
 
 require('./iAjax-Core');
 
-var iAjax = {
+const iAjax = {
 	request,
-	get: function() {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift('get');
-		return httpHelpersBase.apply(null, args);
-	},
-	post: function() {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift('post');
-		return httpHelpersBase.apply(null, args);
-	},
-	put: function() {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift('put');
-		return httpHelpersBase.apply(null, args);
-	},
-	delete: function() {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift('delete');
-		return httpHelpersBase.apply(null, args);
-	},
 	responseParser,
 	form
 };
 
-module.exports = iAjax;
+// generate helpers
+['get','post','put','delete'].forEach(function (v) {
+	iAjax[v] = function() {
+		var args = Array.prototype.slice.call(arguments);
+		args.unshift(v);
+		return httpHelpersBase.apply(null, args);
+	}
+});
+
+export default iAjax;
+// module.exports = iAjax;

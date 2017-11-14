@@ -75,48 +75,51 @@ dispatcher.onGet('/form-get', function(req, res) {
 	res.end(JSON.stringify(jres));
 });
 
-//form post
-dispatcher.onPost('/form-post', function(req, res) {
+//form post,put
+var postPutProcess = function(req, res) {
 	res.writeHead(200, { 'Content-Type': 'application/json' });
 
 	var   jres = {};
 
 	if (req.params.multi) {
 		jres['message'] = req.params['foo[]'] && req.params['foo[]'][0] == 'bar' && req.params['foo[]'][1] == 'baz' ? 'Recieve multi foo param':'Error recieving multi foo param';
-	} else
-		jres['message'] = req.params.foo && req.params.foo == 'bar' ? 'Recieved POST foo=bar':'Error recieving foo';
+	} else {
+		jres['data'] = {};
+		for(i in req.params) {
+			jres['data'][i] = req.params[i];
+		}
+		jres['success'] = true;
+	}
 
 	res.end(JSON.stringify(jres));
+}
 
+dispatcher.onPost('/form-post', postPutProcess);
+dispatcher.onPut('/check-put', postPutProcess);
 
-/*
-	var body = '';
+//form delete
+dispatcher.onDelete('/delete-check', function(req, res) {
+	res.writeHead(200, { 'Content-Type': 'application/json' });
 
-	req.on('data', function(data) {
-		body += data;
-		console.log('dataaaa');
-	});
+	var jres = { success: true }
 
-	req.on('end', function() {
-		var POST = qs.parse(body);
-console.log('postdata', POST);
-		var jres = {};
-		if (POST.multi) {
-			jres['message'] = POST['foo[]'][0] == 'bar' && POST['foo[]'][1] == 'baz' ? 'Success multi':'Error multi param values';
-		} else jres['message'] = POST.foo != 'bar' ? 'Error param value':'Success';
-
-		res.end(JSON.stringify(jres));
-	});
-*/
+	res.end(JSON.stringify(jres));
 });
 
 var multipartFormAction = function(req, res) {
 	res.writeHead(200, { 'Content-Type': 'application/json' });
 
-	var busboy = new Busboy({ headers: req.headers }), jres = { data:{} };
+	var busboy = new Busboy({ headers: req.headers }), jres = { data:{ }, files:{ } };
 
 	busboy.on('field', function(name, val) {
 		jres['data'][name] = val;
+	});
+
+	busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+		jres['files'][filename] = { encoding: encoding, mimetype: mimetype, length: 0 };
+		file.on('data', function(data) {
+			jres['files'][filename]['length'] += data.length;
+		});
 	});
 
 	busboy.on('finish', function() {
@@ -170,7 +173,6 @@ dispatcher.onGet('/tests.js', function(req, res) {
 
 http.createServer(function(req, res) {
 	try {
-		console.log(req.url);
 		if (req.method == 'POST' && req.headers['content-type'].indexOf('multipart') > -1) multipartFormAction(req, res);
 			else dispatcher.dispatch(req, res);
 	} catch(e) {

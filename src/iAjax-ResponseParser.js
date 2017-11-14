@@ -18,8 +18,8 @@ export default function(xhr) {
 	}
 
 	for(var i in parsers) {
-		var mimes = i.split(',');
-		if (mimes.indexOf(xhr.getResponseHeader('Content-Type')) > -1) {
+		var mimes = i.split(','), rType = xhr.getResponseHeader('Content-Type').split(';');
+		if (mimes.indexOf(rType[0]) > -1) {
 			return parsers[i](xhr.responseText);
 		}
 	}
