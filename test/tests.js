@@ -514,6 +514,13 @@ function testBatchFileSend() {
 			progress: function() {
 				console.log('progress', arguments);
 			},
+			loadEnd: function(ctx, e, xhr, batch) {
+				console.log('Batch loadEnd', arguments);
+				if (batch == 2) {
+					console.log('Batch cancel loop');
+					return false;
+				}
+			},
 			error: function(type, form, e, xhr) {
 				frmDiv.style.display = 'none';
 				addLogMsg('Batch File Form - <i style="color:red">failed</i>');

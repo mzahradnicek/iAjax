@@ -13,7 +13,7 @@ dispatcher.onGet('/simple-text', function(req, res) {
 });
 
 dispatcher.onGet('/error-500', function(req, res) {
-	res.writeHead(500);
+	res.writeHead(500, { 'Content-Type': 'text/plain' });
 	res.end('http server error 500');
 });
 

@@ -22,5 +22,5 @@ const iAjax = {
 	}
 });
 
-export default iAjax;
-// module.exports = iAjax;
+//export default iAjax;
+module.exports = iAjax;

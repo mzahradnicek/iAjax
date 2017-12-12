@@ -81,18 +81,18 @@ Form.prototype = {
 			return;
 		}
 
-		reqOpt['loadStart'] = this.frmLoadStartEvent.bind(this);
-		reqOpt['progress'] = this.frmProgressEvent.bind(this);
-		reqOpt['error'] = this.frmErrorEvent.bind(this);
-		reqOpt['abort'] = this.frmAbortEvent.bind(this);
-		reqOpt['load'] = this.frmLoadEvent.bind(this);
-		reqOpt['loadEnd'] = this.frmLoadEndEvent.bind(this);
-		reqOpt['success'] = this.frmSuccessEvent.bind(this);
-
 		if (this.hasFiles && this.opt.batch) {
 			this.runBatch(reqOpt);
 			return;
 		}
+
+		reqOpt['loadStart'] = this.frmLoadStartEvent(this);
+		reqOpt['progress'] = this.frmProgressEvent(this);
+		reqOpt['error'] = this.frmErrorEvent(this);
+		reqOpt['abort'] = this.frmAbortEvent(this);
+		reqOpt['load'] = this.frmLoadEvent(this);
+		reqOpt['loadEnd'] = this.frmLoadEndEvent(this);
+		reqOpt['success'] = this.frmSuccessEvent(this);
 
 		if (['post','put'].indexOf(this.opt.method) != -1) {	//make form data
 			if (this.hasFiles) {
@@ -136,13 +136,21 @@ Form.prototype = {
 		}
 
 		asyncLoop(files.length, function(loop) {
-			var data = vals.concat([ ]);
-			data.push(files[loop.iteration()]);
+			var data = vals.concat([ ]),
+				lI = loop.iteration();
+			data.push(files[lI]);
 
 			reqOpt['data'] = this.mkFormData(data);
 
+			reqOpt['loadStart'] = this.frmLoadStartEvent(this, lI);
+			reqOpt['progress'] = this.frmProgressEvent(this, lI);
+			reqOpt['error'] = this.frmErrorEvent(this, lI);
+			reqOpt['abort'] = this.frmAbortEvent(this, lI);
+			reqOpt['load'] = this.frmLoadEvent(this, lI);
+			reqOpt['success'] = this.frmSuccessEvent(this, lI);
+
 			reqOpt['loadEnd'] = function() {
-				if (this.frmLoadEndEvent.apply(this, arguments) !== false) loop.next();
+				if (this.frmLoadEndEvent(this, lI).apply(this, arguments) !== false) loop.next();
 			}.bind(this);
 
 			//send file
@@ -152,26 +160,40 @@ Form.prototype = {
 			this.batchDoneEvent();
 		}.bind(this))
 	},
-	frmLoadStartEvent : function(e, xhr) {
-		if (this.opt.loadStart) this.opt.loadStart(this, e, xhr);
+	frmLoadStartEvent: function(ctx, batch) {
+		return function(e, xhr) {
+			if (ctx.opt.loadStart) ctx.opt.loadStart(ctx, e, xhr, batch);
+		}
 	},
-	frmProgressEvent: function(loaded, total, e, xhr) {
-		if (this.opt.progress) this.opt.progress(loaded, total, this, e, xhr);
+	frmProgressEvent: function(ctx, batch) {
+		return function(loaded, total, e, xhr) {
+			if (ctx.opt.progress) ctx.opt.progress(loaded, total, ctx, e, xhr, batch);
+		}
 	},
-	frmErrorEvent: function(error, e, xhr, data) {
-		this.opt.error(error, this, e, xhr, data);
+	frmErrorEvent: function(ctx, batch) {
+		return function(error, e, xhr, data) {
+			ctx.opt.error(error, ctx, e, xhr, data, batch);
+		}
 	},
-	frmAbortEvent: function(e, xhr) {
-		if (this.opt.abort) this.opt.abort(this, e, xhr);
+	frmAbortEvent: function(ctx, batch) {
+		return function(e, xhr) {
+			if (ctx.opt.abort) ctx.opt.abort(ctx, e, xhr, batch);
+		}
 	},
-	frmLoadEvent: function(e, xhr, res) {
-		if (this.opt.load) this.opt.load(this, e, xhr, res);
+	frmLoadEvent: function(ctx, batch) {
+		return function(e, xhr, res) {
+			if (ctx.opt.load) ctx.opt.load(ctx, e, xhr, res, batch);
+		}
 	},
-	frmSuccessEvent: function(data, e, xhr) {
-		this.opt.success(data, this, e, xhr);
+	frmSuccessEvent: function(ctx, batch) {
+		return function(data, e, xhr) {
+			ctx.opt.success(data, ctx, e, xhr, batch);
+		}
 	},
-	frmLoadEndEvent: function(e, xhr) {
-		if (this.opt.loadEnd) return this.opt.loadEnd(this, e, xhr);
+	frmLoadEndEvent: function(ctx, batch) {
+		return function(e, xhr) {
+			if (ctx.opt.loadEnd) return ctx.opt.loadEnd(ctx, e, xhr, batch);
+		}
 	},
 
 	// batch EVENTs

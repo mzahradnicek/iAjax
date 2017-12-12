@@ -6,7 +6,7 @@ module.exports = {
 		path			: __dirname+'/dist',
 		filename		: 'iAjax.js',
 		library			: 'iAjax',
-		libraryTarget	: 'var'
+		libraryTarget	: 'var'		// amd
 	},
 	module		: {
 		loaders		: [

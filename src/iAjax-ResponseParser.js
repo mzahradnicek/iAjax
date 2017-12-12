@@ -17,9 +17,12 @@ export default function(xhr) {
 		}
 	}
 
+	var ct = xhr.getResponseHeader('Content-Type');
+	if (ct) ct = ct.split(';')[0];
+
 	for(var i in parsers) {
-		var mimes = i.split(','), rType = xhr.getResponseHeader('Content-Type').split(';');
-		if (mimes.indexOf(rType[0]) > -1) {
+		var mimes = i.split(',');
+		if (mimes.indexOf(ct) > -1) {
 			return parsers[i](xhr.responseText);
 		}
 	}
