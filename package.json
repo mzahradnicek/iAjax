@@ -1,41 +1,43 @@
 {
-  "name": "iajax",
-  "version": "1.0.14",
-  "description": "Ajax wrapper library",
-  "main": "src/iAjax.js",
-  "files": [ "src/", "dist/" ],
-  "directories": {
-    "doc": "docs",
-    "example": "examples"
-  },
-  "dependencies": {
-  },
-  "devDependencies": {
-    "busboy": "^0.2.14",
-    "httpdispatcher": "^2.0.1",
-    "webpack": "^1.13.3",
-    "babel-core": "^6.18.2",
-    "babel-loader": "^6.2.8",
-    "babel-polyfill": "^6.16.0",
-    "babel-preset-latest": "^6.16.0"
-  },
+  "name": "iAjax",
+  "version": "1.0.0",
+  "description": "Javascript Ajax library",
+  "main": "lib/iAjax.js",
   "scripts": {
-    "test": "node test/server.js"
+    "build": "webpack --env dev && webpack --env build",
+    "dev": "webpack --progress --colors --watch --env dev",
+    "test": "mocha --require babel-register --colors ./test/*.spec.js",
+    "test:watch": "mocha --require babel-register --colors -w ./test/*.spec.js",
+    "test:cover": "cross-env NODE_ENV=test nyc mocha --require babel-register --colors test/*.js",
+    "repl": "node -i -e \"$(< ./lib/webpack-library-starter.js)\""
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mzahradnicek/iAjax.git"
-  },
-  "keywords": [
-    "ajax",
-    "forms",
-    "xhr",
-    "xmlhttpresponse"
-  ],
   "author": "Michal Zahradníček",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/mzahradnicek/iAjax/issues"
+  "devDependencies": {
+    "@babel/cli": "^7.0.0-beta.51",
+    "@babel/core": "^7.0.0-beta.51",
+    "@babel/preset-env": "^7.0.0-beta.51",
+    "babel-eslint": "^8.0.3",
+    "babel-loader": "^8.0.0-beta.4",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-istanbul": "^5.1.0",
+    "babel-preset-env": "^7.0.0-beta.3",
+    "babel-register": "^7.0.0-beta.3",
+    "chai": "^4.1.2",
+    "cross-env": "^5.2.0",
+    "eslint": "^5.0.1",
+    "eslint-loader": "^2.0.0",
+    "jsdom": "11.11.0",
+    "jsdom-global": "3.0.2",
+    "mocha": "^4.0.1",
+    "uglifyjs-webpack-plugin": "^1.2.7",
+    "webpack": "^4.12.2",
+    "webpack-cli": "^3.0.8",
+    "yargs": "^10.0.3",
+    "nyc": "^13.1.0"
   },
-  "homepage": "https://github.com/mzahradnicek/iAjax#readme"
+  "nyc": {
+    "sourceMap": false,
+    "instrument": false
+  }
 }
